@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "centos/7"
+  config.vm.hostname = "tikies"
+  config.vm.network "private_network", ip: "192.168.88.88"
+  config.vm.synced_folder "~/workspaces", "/var/www", :mount_options => ["dmode=777", "fmode=777"], create: true
+  
+  config.vm.provider :virtualbox do |v|
+    v.name = "tikies"
+    v.memory = 512
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "../provision/es.yml"
+    ansible.sudo = true
+  end
+end	

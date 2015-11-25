@@ -1,0 +1,11 @@
+---
+# Ansible playbook for a demo Elasticsearch server
+
+- name: Elasticsearch Test Server
+  hosts: all
+  become: yes
+  become_user: root
+
+  roles:
+    - common
+    - elasticsearch
