@@ -1,4 +1,4 @@
-# demo-es
+# Demo Elasticsearch
 
 ## Requirements
 
