@@ -426,4 +426,82 @@ class DemoESTest extends \Codeception\TestCase\Test
             );
         }
     }
+
+    public function testSearchWithSynonyms()
+    {
+        $indexSettings = json_decode(file_get_contents(__DIR__ . '/../_data/productIndex.json'), true);
+
+        // custom synonyms
+        $synonyms = [];
+        $synonyms[] = "tai nghe,headphone";
+        $synonyms[] = "chụp hình,chụp ảnh";
+        $indexSettings['settings']['index']['analysis']['filter']['name_synonym_filter']['synonyms'] = $synonyms;
+
+        $path = '/test/product/';
+
+        // create index
+        $this->client->request($path, Request::PUT, $indexSettings);
+
+
+        // insert data test
+        $productData = json_decode($this->sampleProductJson, true);
+        $productNames = [
+            "tai nghe abc",
+            "headphone xyz",
+            "headphone tai nghe",
+            "tai abc nghe",
+            "wrong name",
+            "gậy chụp hình abc",
+            "gậy chụp ảnh xyz",
+            "chụp hình cho trẻ",
+            "công việc chụp ảnh",
+            "ảnh hình",
+        ];
+        $i = 1;
+        foreach ($productNames as $name) {
+            $productData['searchable_name'] = $name;
+            $this->client->request($path . $i++, Request::PUT, [
+                'searchable_name' => $name,
+                'type' => 'sample',
+                'attribute' => 'any attribtue',
+                'value' => rand(1, 999),
+            ]);
+        }
+
+        // wait for index
+        sleep(3);
+
+        foreach ($synonyms as $syn) {
+            $keywords = explode(',', $syn);
+            // with unmarked field is using synonyms and not unmarked field not use
+            $dataForFirstKeyword = $this->client->request($path . '_search', Request::GET, [
+                'query' => [
+                    'match_phrase' => [
+                        'searchable_name.unmarked' => $keywords[0],
+                    ]
+                ]
+            ])->getData();
+            $dataForFirstKeywordNotUnmarked = $this->client->request($path . '_search', Request::GET, [
+                'query' => [
+                    'match_phrase' => [
+                        'searchable_name' => $keywords[0],
+                    ]
+                ]
+            ])->getData();
+
+            // responses of search no synonym and search with synonyms are different
+            $this->assertNotEquals($dataForFirstKeyword['hits'], $dataForFirstKeywordNotUnmarked['hits']);
+
+            $dataForSecondKeyword = $this->client->request($path . '_search', Request::GET, [
+                'query' => [
+                    'match_phrase' => [
+                        'searchable_name.unmarked' => $keywords[1],
+                    ]
+                ]
+            ])->getData();
+
+            // test responses of 2 synonym keywords are same
+            $this->assertEquals($dataForFirstKeyword['hits'], $dataForSecondKeyword['hits']);
+        }
+    }
 }
