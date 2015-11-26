@@ -1,0 +1,21 @@
+{
+    "name": "hatdao/demo-elasticsearch",
+    "description": "Demo Elasticsearch for Barcamp Saigon 2015!",
+    "version": "0.1.0",
+    "type": "library",
+    "keywords": ["demo", "elasticsearch", "phpunit"],
+    "homepage": "http://tiki.vn",
+    "time": "2015-11-25",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hat Dao",
+            "email": "hat.dao@tiki.vn",
+    		"homepage": "http://tiki.vn"
+        }
+    ],
+    "require": {
+        "codeception/codeception": "*",
+        "ruflin/elastica": "*"
+    }
+}

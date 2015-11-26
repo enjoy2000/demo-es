@@ -34,17 +34,17 @@
 - name: Disable firewalld
   service: name=firewalld enabled=no state=stopped
 
-- name: "Install utils: vim, wget, telnet, htop, ntpdate"
-  yum: >
-    name={{ item }}
-    state=present
-  with_items:
-    - vim
-    - wget
-    - htop
-    - ntpdate
-    - telnet
-    - unzip
+#- name: "Install utils: vim, wget, telnet, htop, ntpdate"
+#  yum: >
+#    name={{ item }}
+#    state=present
+#  with_items:
+#    - vim
+#    - wget
+#    - htop
+#    - ntpdate
+#    - telnet
+#    - unzip
 
 - name: update timezone HCM
   command: /bin/timedatectl set-timezone Asia/Ho_Chi_Minh
